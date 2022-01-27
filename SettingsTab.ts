@@ -19,6 +19,19 @@ class GPTSettingTab extends PluginSettingTab {
     containerEl.createEl("h3", { text: "API Keys" });
 
     new Setting(containerEl)
+      .setName("OpenAI API Key")
+      .setDesc("Enter your OpenAI API Key")
+      .addText((text) =>
+        text
+          .setPlaceholder("API Key")
+          .setValue(this.plugin.settings.gpt3ApiKey)
+          .onChange(async (value) => {
+            this.plugin.settings.gpt3ApiKey = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
       .setName("Exafunction API Key")
       .setDesc("Enter your Exafunction API Key")
       .addText((text) =>
