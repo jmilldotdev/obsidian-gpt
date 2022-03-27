@@ -3,10 +3,10 @@ export const VIEW_TYPE_MODEL_SETTINGS = "gptModelSettings";
 // GPT-3
 
 export enum GPT3ModelType {
-  Ada = "ada",
-  Babbage = "babbage",
-  Curie = "curie",
-  DaVinci = "davinci",
+  Ada = "text-ada-001",
+  Babbage = "text-babbage-001",
+  Curie = "text-curie-001",
+  DaVinci = "text-davinci-002",
 }
 
 export interface GPT3Settings {
@@ -99,6 +99,7 @@ export interface GPTPluginSettings {
   tagCompletionsHandlerTags: HandlerTags;
   tagPrompts: boolean;
   tagPromptsHandlerTags: HandlerTags;
+  insertToken: string;
 }
 
 export const DEFAULT_SETTINGS: GPTPluginSettings = {
@@ -121,6 +122,7 @@ export const DEFAULT_SETTINGS: GPTPluginSettings = {
     openingTag: "<Prompt>",
     closingTag: "</Prompt>",
   },
+  insertToken: "[insert]",
 };
 
 // Utils

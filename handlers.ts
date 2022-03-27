@@ -63,9 +63,9 @@ export const getAI21Completion = async (
 export const getGPT3Completion = async (
   apiKey: string,
   prompt: string,
-  settings: GPT3Settings
+  settings: GPT3Settings,
+  suffix?: string
 ): Promise<string> => {
-  console.log("Getting GPT-3 Completion");
   const apiUrl = `https://api.openai.com/v1/engines/${settings.modelType}/completions`;
   const headers = {
     Authorization: `Bearer ${apiKey}`,
@@ -76,7 +76,41 @@ export const getGPT3Completion = async (
     prompt,
     ...pythonifyKeys(params),
     stop: settings.stop.length > 0 ? settings.stop : undefined,
+    suffix: suffix ? suffix : undefined,
   };
+  const res: any = await fetch(apiUrl, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+  return res ? res.choices[0].text : null;
+};
+
+export const getGPT3Edit = async (
+  apiKey: string,
+  prompt: string,
+  instruction: string,
+  settings: GPT3Settings
+): Promise<string> => {
+  const apiUrl = `https://api.openai.com/v1/engines/text-davinci-edit-001/edits`;
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/json",
+  };
+  const { temperature, topP } = settings;
+  let body = {
+    input: prompt,
+    instruction,
+    temperature,
+    top_p: topP,
+  };
+  console.log(body);
   const res: any = await fetch(apiUrl, {
     method: "POST",
     headers,
