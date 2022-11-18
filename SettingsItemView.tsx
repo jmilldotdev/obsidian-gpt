@@ -105,85 +105,6 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
   );
 };
 
-const GPTJSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
-  const [state, setState] = React.useState(
-    plugin.settings.modelSettings.gptJSettings
-  );
-
-  const handleInputChange = async (e: any) => {
-    let { name, value } = e.target;
-    value = parseFloat(value) ? parseFloat(value) : value;
-    setState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-    plugin.settings.modelSettings.gptJSettings = {
-      ...plugin.settings.modelSettings.gptJSettings,
-      [name]: value,
-    };
-    await plugin.saveSettings();
-  };
-
-  return (
-    <form>
-      <label htmlFor="modelName">Min Tokens:</label>
-      <input
-        type="number"
-        name="minLength"
-        id="minLength"
-        value={state.minLength}
-        onChange={handleInputChange}
-        min="0"
-        max="1024"
-      />
-      <br />
-      <label htmlFor="modelName">Max Tokens:</label>
-      <input
-        type="number"
-        name="maxLength"
-        id="maxLength"
-        value={state.maxLength}
-        onChange={handleInputChange}
-        min="0"
-        max="1024"
-      />
-      <br />
-      <label htmlFor="modelName">Temperature:</label>
-      <input
-        type="number"
-        name="temperature"
-        id="temperature"
-        value={state.temperature}
-        onChange={handleInputChange}
-        min="0"
-        max="1"
-      />
-      <br />
-      <label htmlFor="modelName">Top K:</label>
-      <input
-        type="number"
-        name="topK"
-        id="topK"
-        value={state.topK}
-        onChange={handleInputChange}
-        min="0"
-      />
-      <br />
-      <label htmlFor="modelName">Top P:</label>
-      <input
-        type="number"
-        name="topP"
-        id="topP"
-        value={state.topP}
-        onChange={handleInputChange}
-        min="0"
-        max="1"
-      />
-      <br />
-    </form>
-  );
-};
-
 const AI21SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
   const [state, setState] = React.useState(
     plugin.settings.modelSettings.ai21Settings
@@ -271,14 +192,10 @@ const SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         }}
       >
         <option value={SupportedModels.GPT3}>GPT-3</option>
-        <option value={SupportedModels.GPTJ}>GPT-J</option>
         <option value={SupportedModels.AI21}>AI21</option>
       </select>
       {activeModel === SupportedModels.GPT3 && (
         <GPT3SettingsForm plugin={plugin} />
-      )}
-      {activeModel === SupportedModels.GPTJ && (
-        <GPTJSettingsForm plugin={plugin} />
       )}
       {activeModel === SupportedModels.AI21 && (
         <AI21SettingsForm plugin={plugin} />

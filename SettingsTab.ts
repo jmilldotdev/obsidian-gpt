@@ -32,19 +32,6 @@ class GPTSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Exafunction API Key")
-      .setDesc("Enter your Exafunction API Key")
-      .addText((text) =>
-        text
-          .setPlaceholder("API Key")
-          .setValue(this.plugin.settings.gptJApiKey)
-          .onChange(async (value) => {
-            this.plugin.settings.gptJApiKey = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
       .setName("AI21 API Key")
       .setDesc("Enter your AI21 API Key")
       .addText((text) =>
