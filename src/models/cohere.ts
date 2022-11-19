@@ -32,8 +32,7 @@ export const defaultCohereSettings: CohereSettings = {
 export const getCohereCompletion = async (
   apiKey: string,
   prompt: string,
-  settings: CohereSettings,
-  suffix?: string
+  settings: CohereSettings
 ): Promise<string> => {
   const apiUrl = `https://api.cohere.ai/generate`;
   const headers = {

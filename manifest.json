@@ -1,10 +1,10 @@
 {
-	"id": "obsidian-gpt",
-	"name": "Obsidian GPT",
-	"version": "0.1.0",
-	"minAppVersion": "0.9.12",
-	"description": "Work with language models in Obsidian",
-	"author": "Jonathan Miller",
-	"authorUrl": "https://jmill.dev",
-	"isDesktopOnly": false
+  "id": "obsidian-gpt",
+  "name": "Obsidian GPT",
+  "version": "0.2.0",
+  "minAppVersion": "0.9.12",
+  "description": "GPT & Large Language Model completions in Obsidian editor via API",
+  "author": "Jonathan Miller",
+  "authorUrl": "https://jmill.dev",
+  "isDesktopOnly": false
 }

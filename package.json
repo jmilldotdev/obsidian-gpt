@@ -1,7 +1,7 @@
 {
   "name": "obsidian-gpt",
-  "version": "0.1.0",
-  "description": "GPT completions in Obsidian editor via API",
+  "version": "0.2.0",
+  "description": "GPT & Large Language Model completions in Obsidian editor via API",
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",

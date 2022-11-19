@@ -1,18 +1,22 @@
-# Obsidian GPT
+# Obsidian GPT (& Friends)
 
-Text completions via GPT-J.
+Text completions via Large Language Models.
 
-API provided by [Exafunction](https://www.exafunction.com/nlp). Please note this service is not completely free, but provides a free tier for usage.
+Currently supported providers:
+- [OpenAI](https://openai.com/api/)
+- [AI21](https://studio.ai21.com/overview)
+- [Cohere](https://cohere.ai/)
 
 ## Setup
 
-Get an API key from Exafunction [Exafunction](https://www.exafunction.com/nlp) and add it to the `GPT-J API Key` field in the settings tab
+Acquire an API key from one or more of the supported providers. Open the plugin settings and paste the API key you wish to use in the field for the respective provider.
+
 
 ## Usage
 
 Command `Get Completion` will get a completion for either the current selection if text is selected, or for the current line if no text is selected. The completion will be pasted where the cursor is.
 
-Model settings can be tuned in the settings panel in the right-hand side pane. Available settings are: `Min Tokens`, `Max Tokens`, `Temperature`, `Top K`, and `Top P`
+Model settings can be tuned in the settings panel in the right-hand side pane. Command `Show Model Settings` will open the model settings pane in a leaf on the right-hand sidebar.
 
 ## Usage Warning
 
