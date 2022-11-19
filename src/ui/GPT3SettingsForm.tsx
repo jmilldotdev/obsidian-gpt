@@ -33,6 +33,7 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         <option value={GPT3ModelType.Ada}>Ada</option>
         <option value={GPT3ModelType.Babbage}>Babbage</option>
         <option value={GPT3ModelType.Curie}>Curie</option>
+        <option value={GPT3ModelType.TextDaVinci}>Text-Davinci</option>
         <option value={GPT3ModelType.DaVinci}>Davinci</option>
       </select>
       <br />

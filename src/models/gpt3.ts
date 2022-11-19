@@ -4,7 +4,8 @@ export enum GPT3ModelType {
   Ada = "text-ada-001",
   Babbage = "text-babbage-001",
   Curie = "text-curie-001",
-  DaVinci = "text-davinci-002",
+  TextDaVinci = "text-davinci-002",
+  DaVinci = "davinci",
 }
 
 export interface GPT3Settings {
@@ -33,7 +34,7 @@ export const getGPT3Completion = async (
   settings: GPT3Settings,
   suffix?: string
 ): Promise<string> => {
-  const apiUrl = `https://api.openai.com/v1/engines/${settings.modelType}/completions`;
+  const apiUrl = `https://api.openai.com/v1/completions`;
   const headers = {
     Authorization: `Bearer ${apiKey}`,
     "Content-Type": "application/json",
@@ -41,6 +42,7 @@ export const getGPT3Completion = async (
   const { modelType, ...params } = settings;
   let body = {
     prompt,
+    model: modelType,
     ...pythonifyKeys(params),
     stop: settings.stop.length > 0 ? settings.stop : undefined,
     suffix: suffix ? suffix : undefined,
