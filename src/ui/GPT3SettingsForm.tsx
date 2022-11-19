@@ -1,4 +1,5 @@
 import * as React from "react";
+import StopSequenceInput from "src/ui/StopSequenceInput";
 
 import { GPT3ModelType } from "../models/gpt3";
 import GPTPlugin from "../../main";
@@ -9,7 +10,9 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
 
   const handleInputChange = async (e: any) => {
     let { name, value } = e.target;
-    value = parseFloat(value) ? parseFloat(value) : value;
+    if (parseFloat(value) || value === "0") {
+      value = parseFloat(value);
+    }
     setState((prevState) => ({
       ...prevState,
       [name]: value,
@@ -18,6 +21,15 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
       ...gpt3.settings,
       [name]: value,
     };
+    await plugin.saveSettings();
+  };
+
+  const onStopSequenceChange = async (stopSequences: string[]) => {
+    setState((prevState) => ({
+      ...prevState,
+      stop: stopSequences,
+    }));
+    gpt3.settings.stop = stopSequences;
     await plugin.saveSettings();
   };
 
@@ -90,6 +102,11 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         onChange={handleInputChange}
         min="0"
         max="1"
+      />
+      <br />
+      <StopSequenceInput
+        stopSequences={state.stop}
+        onChange={onStopSequenceChange}
       />
     </form>
   );

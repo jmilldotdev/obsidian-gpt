@@ -1,17 +1,18 @@
 import * as React from "react";
+import StopSequenceInput from "src/ui/StopSequenceInput";
 
 import { AI21ModelType } from "../models/ai21";
 import GPTPlugin from "../../main";
 
 const AI21SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
-  const [state, setState] = React.useState(
-    plugin.settings.models.ai21.settings
-  );
+  const { ai21 } = plugin.settings.models;
+  const [state, setState] = React.useState(ai21.settings);
 
   const handleInputChange = async (e: any) => {
-    const { ai21 } = plugin.settings.models;
     let { name, value } = e.target;
-    value = parseFloat(value) ? parseFloat(value) : value;
+    if (parseFloat(value) || value === "0") {
+      value = parseFloat(value);
+    }
     setState((prevState) => ({
       ...prevState,
       [name]: value,
@@ -20,6 +21,15 @@ const AI21SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
       ...ai21.settings,
       [name]: value,
     };
+    await plugin.saveSettings();
+  };
+
+  const onStopSequenceChange = async (stopSequences: string[]) => {
+    setState((prevState) => ({
+      ...prevState,
+      stop: stopSequences,
+    }));
+    ai21.settings.stop = stopSequences;
     await plugin.saveSettings();
   };
 
@@ -67,6 +77,11 @@ const AI21SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         onChange={handleInputChange}
         min="0"
         max="1"
+      />
+      <br />
+      <StopSequenceInput
+        stopSequences={state.stop}
+        onChange={onStopSequenceChange}
       />
     </form>
   );

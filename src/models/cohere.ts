@@ -46,9 +46,8 @@ export const getCohereCompletion = async (
     prompt,
     model: modelType,
     ...pythonifyKeys(params),
-    stop:
+    stop_sequences:
       settings.stopSequences.length > 0 ? settings.stopSequences : undefined,
-    suffix: suffix ? suffix : undefined,
   };
   const res: any = await fetch(apiUrl, {
     method: "POST",
@@ -61,6 +60,5 @@ export const getCohereCompletion = async (
     .catch((err) => {
       console.error(err);
     });
-  console.log(res);
   return res?.generations?.[0]?.text ?? null;
 };

@@ -1,4 +1,5 @@
 import * as React from "react";
+import StopSequenceInput from "src/ui/StopSequenceInput";
 
 import { CohereModelType } from "../models/cohere";
 import GPTPlugin from "../../main";
@@ -9,7 +10,9 @@ const CohereSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
 
   const handleInputChange = async (e: any) => {
     let { name, value } = e.target;
-    value = parseFloat(value) ? parseFloat(value) : value;
+    if (parseFloat(value) || value === "0") {
+      value = parseFloat(value);
+    }
     setState((prevState) => ({
       ...prevState,
       [name]: value,
@@ -18,6 +21,15 @@ const CohereSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
       ...cohere.settings,
       [name]: value,
     };
+    await plugin.saveSettings();
+  };
+
+  const onStopSequenceChange = async (stopSequences: string[]) => {
+    setState((prevState) => ({
+      ...prevState,
+      stop: stopSequences,
+    }));
+    cohere.settings.stopSequences = stopSequences;
     await plugin.saveSettings();
   };
 
@@ -55,7 +67,7 @@ const CohereSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         value={state.temperature}
         onChange={handleInputChange}
         min="0"
-        max="1"
+        max="5"
       />
       <br />
       <label htmlFor="modelName">p:</label>
@@ -100,6 +112,11 @@ const CohereSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         onChange={handleInputChange}
         min="0"
         max="1"
+      />
+      <br />
+      <StopSequenceInput
+        stopSequences={state.stopSequences}
+        onChange={onStopSequenceChange}
       />
     </form>
   );
