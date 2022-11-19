@@ -1,5 +1,6 @@
 import { Editor, Plugin, WorkspaceLeaf } from "obsidian";
 import { AI21Settings, getAI21Completion } from "src/models/ai21";
+import { getCohereCompletion } from "src/models/cohere";
 import { getGPT3Completion, GPT3Settings } from "src/models/gpt3";
 import {
   gettingCompletionNotice,
@@ -48,20 +49,26 @@ export default class GPTPlugin extends Plugin {
   }
 
   async getCompletion(selection: string): Promise<string | null> {
-    const { ai21, gpt3 } = this.settings.models;
+    const { ai21, gpt3, cohere } = this.settings.models;
     let completion: string;
     const notice = gettingCompletionNotice(this.settings.activeModel);
     if (this.settings.activeModel === SupportedModels.AI21) {
       completion = await getAI21Completion(
         ai21.apiKey,
         selection,
-        ai21.settings as AI21Settings
+        ai21.settings
       );
     } else if (this.settings.activeModel === SupportedModels.GPT3) {
       completion = await getGPT3Completion(
         gpt3.apiKey,
         selection,
-        gpt3.settings as GPT3Settings
+        gpt3.settings
+      );
+    } else if (this.settings.activeModel === SupportedModels.COHERE) {
+      completion = await getCohereCompletion(
+        cohere.apiKey,
+        selection,
+        cohere.settings
       );
     }
     notice.hide();

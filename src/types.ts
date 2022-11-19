@@ -1,4 +1,5 @@
 import { AI21Settings, defaultAI21Settings } from "src/models/ai21";
+import { CohereSettings, defaultCohereSettings } from "src/models/cohere";
 import { GPT3Settings, defaultGPT3Settings } from "src/models/gpt3";
 
 export const VIEW_TYPE_MODEL_SETTINGS = "gptModelSettings";
@@ -6,6 +7,7 @@ export const VIEW_TYPE_MODEL_SETTINGS = "gptModelSettings";
 export enum SupportedModels {
   GPT3 = "GPT-3",
   AI21 = "AI21",
+  COHERE = "Cohere",
 }
 
 export interface Models {
@@ -16,6 +18,10 @@ export interface Models {
   ai21: {
     apiKey: string;
     settings: AI21Settings;
+  };
+  cohere: {
+    apiKey: string;
+    settings: CohereSettings;
   };
 }
 
@@ -44,6 +50,10 @@ export const DEFAULT_SETTINGS: GPTPluginSettings = {
     ai21: {
       apiKey: "",
       settings: defaultAI21Settings,
+    },
+    cohere: {
+      apiKey: "",
+      settings: defaultCohereSettings,
     },
   },
   tagCompletions: false,

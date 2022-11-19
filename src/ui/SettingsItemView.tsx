@@ -11,6 +11,7 @@ import {
 import GPTPlugin from "main";
 import GPT3SettingsForm from "./GPT3SettingsForm";
 import AI21SettingsForm from "./AI21SettingsForm";
+import CohereSettingsForm from "./CohereSettingsForm";
 
 const SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
   const [activeModel, setActiveModel] = React.useState(
@@ -32,12 +33,16 @@ const SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
       >
         <option value={SupportedModels.GPT3}>GPT-3</option>
         <option value={SupportedModels.AI21}>AI21</option>
+        <option value={SupportedModels.COHERE}>Cohere</option>
       </select>
       {activeModel === SupportedModels.GPT3 && (
         <GPT3SettingsForm plugin={plugin} />
       )}
       {activeModel === SupportedModels.AI21 && (
         <AI21SettingsForm plugin={plugin} />
+      )}
+      {activeModel === SupportedModels.COHERE && (
+        <CohereSettingsForm plugin={plugin} />
       )}
     </div>
   );

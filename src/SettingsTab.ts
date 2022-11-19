@@ -11,7 +11,7 @@ class GPTSettingTab extends PluginSettingTab {
 
   display(): void {
     let { containerEl } = this;
-    let { gpt3, ai21 } = this.plugin.settings.models;
+    let { gpt3, ai21, cohere } = this.plugin.settings.models;
 
     containerEl.empty();
 
@@ -41,6 +41,19 @@ class GPTSettingTab extends PluginSettingTab {
           .setValue(ai21.apiKey)
           .onChange(async (value) => {
             ai21.apiKey = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Cohere API Key")
+      .setDesc("Enter your Cohere API Key")
+      .addText((text) =>
+        text
+          .setPlaceholder("API Key")
+          .setValue(cohere.apiKey)
+          .onChange(async (value) => {
+            cohere.apiKey = value;
             await this.plugin.saveSettings();
           })
       );
