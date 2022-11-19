@@ -11,6 +11,7 @@ class GPTSettingTab extends PluginSettingTab {
 
   display(): void {
     let { containerEl } = this;
+    let { gpt3, ai21 } = this.plugin.settings.models;
 
     containerEl.empty();
 
@@ -24,9 +25,9 @@ class GPTSettingTab extends PluginSettingTab {
       .addText((text) =>
         text
           .setPlaceholder("API Key")
-          .setValue(this.plugin.settings.gpt3ApiKey)
+          .setValue(gpt3.apiKey)
           .onChange(async (value) => {
-            this.plugin.settings.gpt3ApiKey = value;
+            gpt3.apiKey = value;
             await this.plugin.saveSettings();
           })
       );
@@ -37,9 +38,9 @@ class GPTSettingTab extends PluginSettingTab {
       .addText((text) =>
         text
           .setPlaceholder("API Key")
-          .setValue(this.plugin.settings.ai21ApiKey)
+          .setValue(ai21.apiKey)
           .onChange(async (value) => {
-            this.plugin.settings.ai21ApiKey = value;
+            ai21.apiKey = value;
             await this.plugin.saveSettings();
           })
       );

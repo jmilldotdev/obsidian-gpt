@@ -1,15 +1,19 @@
-import SettingsItemView from "SettingsItemView";
 import { Editor, Plugin, WorkspaceLeaf } from "obsidian";
-import { getAI21Completion, getGPT3Completion } from "./handlers";
+import { AI21Settings, getAI21Completion } from "src/models/ai21";
+import { getGPT3Completion, GPT3Settings } from "src/models/gpt3";
 import {
-  VIEW_TYPE_MODEL_SETTINGS,
-  GPTPluginSettings,
-  DEFAULT_SETTINGS,
-  SupportedModels,
+  gettingCompletionNotice,
+  errorGettingCompletionNotice,
+} from "src/notices";
+import GPTSettingTab from "src/SettingsTab";
+import {
   CurrentLineContents,
-} from "./types";
-import GPTSettingTab from "./SettingsTab";
-import { errorGettingCompletionNotice, gettingCompletionNotice } from "notices";
+  DEFAULT_SETTINGS,
+  GPTPluginSettings,
+  SupportedModels,
+  VIEW_TYPE_MODEL_SETTINGS,
+} from "src/types";
+import SettingsItemView from "src/ui/SettingsItemView";
 
 export default class GPTPlugin extends Plugin {
   settings: GPTPluginSettings;
@@ -44,20 +48,20 @@ export default class GPTPlugin extends Plugin {
   }
 
   async getCompletion(selection: string): Promise<string | null> {
-    const { modelSettings } = this.settings;
+    const { ai21, gpt3 } = this.settings.models;
     let completion: string;
     const notice = gettingCompletionNotice(this.settings.activeModel);
     if (this.settings.activeModel === SupportedModels.AI21) {
       completion = await getAI21Completion(
-        this.settings.ai21ApiKey,
+        ai21.apiKey,
         selection,
-        modelSettings.ai21Settings
+        ai21.settings as AI21Settings
       );
     } else if (this.settings.activeModel === SupportedModels.GPT3) {
       completion = await getGPT3Completion(
-        this.settings.gpt3ApiKey,
+        gpt3.apiKey,
         selection,
-        modelSettings.gpt3Settings
+        gpt3.settings as GPT3Settings
       );
     }
     notice.hide();
