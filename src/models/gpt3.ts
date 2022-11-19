@@ -1,3 +1,4 @@
+import { request, RequestParam } from "obsidian";
 import { pythonifyKeys } from "src/util";
 
 export enum GPT3ModelType {
@@ -47,13 +48,16 @@ export const getGPT3Completion = async (
     stop: settings.stop.length > 0 ? settings.stop : undefined,
     suffix: suffix ? suffix : undefined,
   };
-  const res: any = await fetch(apiUrl, {
+  const requestParam: RequestParam = {
+    url: apiUrl,
     method: "POST",
-    headers,
+    contentType: "application/json",
     body: JSON.stringify(body),
-  })
+    headers,
+  };
+  const res: any = await request(requestParam)
     .then((response) => {
-      return response.json();
+      return JSON.parse(response);
     })
     .catch((err) => {
       console.error(err);

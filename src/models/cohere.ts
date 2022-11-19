@@ -1,3 +1,4 @@
+import { request, RequestParam } from "obsidian";
 import { pythonifyKeys } from "src/util";
 
 export enum CohereModelType {
@@ -48,13 +49,16 @@ export const getCohereCompletion = async (
     stop_sequences:
       settings.stopSequences.length > 0 ? settings.stopSequences : undefined,
   };
-  const res: any = await fetch(apiUrl, {
+  const requestParam: RequestParam = {
+    url: apiUrl,
     method: "POST",
-    headers,
+    contentType: "application/json",
     body: JSON.stringify(body),
-  })
+    headers,
+  };
+  const res: any = await request(requestParam)
     .then((response) => {
-      return response.json();
+      return JSON.parse(response);
     })
     .catch((err) => {
       console.error(err);
