@@ -1,5 +1,5 @@
 import * as React from "react";
-// import StopSequenceInput from "src/ui/StopSequenceInput";
+import StopSequenceInput from "src/ui/StopSequenceInput";
 
 import { CohereModelType } from "../models/cohere";
 import GPTPlugin from "../../main";
@@ -114,10 +114,10 @@ const CohereSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         max="1"
       />
       <br />
-      {/* <StopSequenceInput
+      <StopSequenceInput
         stopSequences={state.stopSequences}
         onChange={onStopSequenceChange}
-      /> */}
+      />
     </form>
   );
 };

@@ -1,5 +1,5 @@
 import * as React from "react";
-// import StopSequenceInput from "src/ui/StopSequenceInput";
+import StopSequenceInput from "src/ui/StopSequenceInput";
 
 import { GPT3ModelType } from "../models/gpt3";
 import GPTPlugin from "../../main";
@@ -104,10 +104,10 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         max="1"
       />
       <br />
-      {/* <StopSequenceInput
+      <StopSequenceInput
         stopSequences={state.stop}
         onChange={onStopSequenceChange}
-      /> */}
+      />
     </form>
   );
 };
