@@ -1,4 +1,4 @@
-import { TagsInput } from "react-tag-input-component";
+// import { TagsInput } from "react-tag-input-component";
 import * as React from "react";
 
 const StopSequenceInput = ({
@@ -11,7 +11,7 @@ const StopSequenceInput = ({
   return (
     <>
       <label htmlFor="stopSequence">Stop Sequences:</label>
-      <TagsInput value={stopSequences} onChange={onChange} />
+      {/* <TagsInput value={stopSequences} onChange={onChange} /> */}
     </>
   );
 };

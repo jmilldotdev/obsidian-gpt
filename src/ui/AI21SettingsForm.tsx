@@ -1,5 +1,5 @@
 import * as React from "react";
-import StopSequenceInput from "src/ui/StopSequenceInput";
+// import StopSequenceInput from "src/ui/StopSequenceInput";
 
 import { AI21ModelType } from "../models/ai21";
 import GPTPlugin from "../../main";
@@ -79,10 +79,10 @@ const AI21SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         max="1"
       />
       <br />
-      <StopSequenceInput
+      {/* <StopSequenceInput
         stopSequences={state.stop}
         onChange={onStopSequenceChange}
-      />
+      /> */}
     </form>
   );
 };
