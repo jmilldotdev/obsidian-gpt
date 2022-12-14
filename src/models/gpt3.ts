@@ -20,7 +20,7 @@ export interface GPT3Settings {
 }
 
 export const defaultGPT3Settings: GPT3Settings = {
-  modelType: GPT3ModelType.DaVinci,
+  modelType: GPT3ModelType.TextDaVinci,
   maxTokens: 16,
   temperature: 1.0,
   topP: 1.0,
