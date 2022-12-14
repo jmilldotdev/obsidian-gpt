@@ -5,7 +5,7 @@ export enum GPT3ModelType {
   Ada = "text-ada-001",
   Babbage = "text-babbage-001",
   Curie = "text-curie-001",
-  TextDaVinci = "text-davinci-002",
+  TextDaVinci = "text-davinci-003",
   DaVinci = "davinci",
 }
 
