@@ -7,8 +7,10 @@
     "dev": "rollup --config rollup.config.js -w",
     "build": "rollup --config rollup.config.js --environment BUILD:production"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "obsidian-plugin"
+  ],
+  "author": "Jonathan Miller",
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^18.0.0",
