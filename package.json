@@ -1,6 +1,6 @@
 {
   "name": "obsidian-gpt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GPT & Large Language Model completions in Obsidian editor via API",
   "main": "main.js",
   "scripts": {
