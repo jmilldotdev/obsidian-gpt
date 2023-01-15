@@ -1,7 +1,7 @@
 import { Editor, Plugin, WorkspaceLeaf } from "obsidian";
-import { AI21Settings, getAI21Completion } from "src/models/ai21";
+import { getAI21Completion } from "src/models/ai21";
 import { getCohereCompletion } from "src/models/cohere";
-import { getGPT3Completion, GPT3Settings } from "src/models/gpt3";
+import { getGPT3Completion } from "src/models/gpt3";
 import {
   gettingCompletionNotice,
   errorGettingCompletionNotice,
@@ -18,7 +18,6 @@ import SettingsItemView from "src/ui/SettingsItemView";
 
 export default class GPTPlugin extends Plugin {
   settings: GPTPluginSettings;
-  private view: SettingsItemView;
 
   getSelectedText(editor: Editor) {
     let selectedText: string;
@@ -136,16 +135,39 @@ export default class GPTPlugin extends Plugin {
     });
   }
 
+  ensureLeafExists(active: boolean = false): void {
+    let { workspace } = this.app;
+
+    let preferredSidebar = "right";
+
+    let leaf: WorkspaceLeaf;
+    let existingPluginLeaves = workspace.getLeavesOfType(
+      VIEW_TYPE_MODEL_SETTINGS
+    );
+
+    if (existingPluginLeaves.length > 0) {
+      leaf = existingPluginLeaves[0];
+    } else {
+      leaf =
+        preferredSidebar === "left"
+          ? workspace.getLeftLeaf(false)
+          : workspace.getRightLeaf(false);
+      workspace.revealLeaf(leaf);
+      leaf.setViewState({ type: VIEW_TYPE_MODEL_SETTINGS });
+    }
+
+    if (active) {
+      workspace.setActiveLeaf(leaf);
+    }
+  }
+
   async onload() {
     await this.loadSettings();
 
     this.registerView(
       VIEW_TYPE_MODEL_SETTINGS,
-      (leaf: WorkspaceLeaf) =>
-        (this.view = new SettingsItemView(leaf, this.settings, this))
+      (leaf: WorkspaceLeaf) => new SettingsItemView(leaf, this.settings, this)
     );
-
-    this.initLeaf();
 
     this.addCommand({
       id: "get-completion",
@@ -156,24 +178,16 @@ export default class GPTPlugin extends Plugin {
     this.addCommand({
       id: "show-model-settings",
       name: "Show Model Settings",
-      checkCallback: (checking: boolean) => {
-        if (checking) {
-          return (
-            this.app.workspace.getLeavesOfType(VIEW_TYPE_MODEL_SETTINGS)
-              .length === 0
-          );
-        }
-        this.initLeaf();
+      callback: () => {
+        this.ensureLeafExists(true);
       },
     });
 
     this.addSettingTab(new GPTSettingTab(this.app, this));
-  }
 
-  onunload(): void {
-    this.app.workspace
-      .getLeavesOfType(VIEW_TYPE_MODEL_SETTINGS)
-      .forEach((leaf) => leaf.detach());
+    this.app.workspace.onLayoutReady(() => {
+      this.ensureLeafExists(false);
+    });
   }
 
   async loadSettings() {
