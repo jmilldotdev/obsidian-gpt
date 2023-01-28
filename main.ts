@@ -78,6 +78,23 @@ export default class GPTPlugin extends Plugin {
     errorGettingCompletionNotice();
   }
 
+  formatTag(escaped: string): string {
+    return escaped.replace(/\\[\\rnt]/g, function(matched: string): string {
+      switch (matched) {
+        // this doesn't cover all escapes, but is very safe
+        case "\\\\": return "\\";
+        case "\\r": return "\r";
+        case "\\n": return "\n";
+        case "\\t": return "\t";
+      }
+      return matched;
+    })
+  }
+  
+  trimLines(raw: string): string {
+    return raw.replace(/^[\n\r]+|[\n\r]+$/g, '')
+  }
+
   formatCompletion(prompt: string, completion: string) {
     const {
       tagCompletions,
@@ -87,11 +104,11 @@ export default class GPTPlugin extends Plugin {
     } = this.settings;
 
     if (tagCompletions) {
-      completion = `${tagCompletionsHandlerTags.openingTag}${completion}${tagCompletionsHandlerTags.closingTag}`;
+      completion = `${this.formatTag(tagCompletionsHandlerTags.openingTag)}${this.trimLines(completion)}${this.formatTag(tagCompletionsHandlerTags.closingTag)}`;
     }
 
     if (tagPrompts) {
-      prompt = `${tagPromptsHandlerTags.openingTag}${prompt}${tagPromptsHandlerTags.closingTag}`;
+      prompt = `${this.formatTag(tagPromptsHandlerTags.openingTag)}${prompt}${this.formatTag(tagPromptsHandlerTags.closingTag)}`;
     }
 
     return prompt + completion;
