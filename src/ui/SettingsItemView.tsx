@@ -9,6 +9,7 @@ import {
   SupportedModels,
 } from "../types";
 import GPTPlugin from "main";
+import ChatGPTSettingsForm from "./ChatGPTSettingsForm";
 import GPT3SettingsForm from "./GPT3SettingsForm";
 import AI21SettingsForm from "./AI21SettingsForm";
 import CohereSettingsForm from "./CohereSettingsForm";
@@ -31,10 +32,14 @@ const SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
           await plugin.saveSettings();
         }}
       >
+        <option value={SupportedModels.CHATGPT}>ChatGPT</option>
         <option value={SupportedModels.GPT3}>GPT-3</option>
         <option value={SupportedModels.AI21}>AI21</option>
         <option value={SupportedModels.COHERE}>Cohere</option>
       </select>
+      {activeModel === SupportedModels.CHATGPT && (
+        <ChatGPTSettingsForm plugin={plugin} />
+      )}
       {activeModel === SupportedModels.GPT3 && (
         <GPT3SettingsForm plugin={plugin} />
       )}

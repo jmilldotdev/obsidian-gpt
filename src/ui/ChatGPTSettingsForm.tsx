@@ -1,12 +1,12 @@
 import * as React from "react";
 import StopSequenceInput from "src/ui/StopSequenceInput";
 
-import { GPT3ModelType } from "../models/gpt3";
 import GPTPlugin from "../../main";
+import { ChatGPTModelType } from "src/models/chatGPT";
 
-const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
-  const { gpt3 } = plugin.settings.models;
-  const [state, setState] = React.useState(gpt3.settings);
+const ChatGPTSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
+  const { chatgpt } = plugin.settings.models;
+  const [state, setState] = React.useState(chatgpt.settings);
 
   const handleInputChange = async (e: any) => {
     let { name, value } = e.target;
@@ -17,8 +17,8 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
       ...prevState,
       [name]: value,
     }));
-    gpt3.settings = {
-      ...gpt3.settings,
+    chatgpt.settings = {
+      ...chatgpt.settings,
       [name]: value,
     };
     await plugin.saveSettings();
@@ -29,7 +29,7 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
       ...prevState,
       stop: stopSequences,
     }));
-    gpt3.settings.stop = stopSequences;
+    chatgpt.settings.stop = stopSequences;
     await plugin.saveSettings();
   };
 
@@ -42,12 +42,7 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         value={state.modelType}
         onChange={handleInputChange}
       >
-        <option value={GPT3ModelType.Ada}>Ada</option>
-        <option value={GPT3ModelType.Babbage}>Babbage</option>
-        <option value={GPT3ModelType.Curie}>Curie</option>
-        <option value={GPT3ModelType.TextDaVinci}>Text-Davinci</option>
-        <option value={GPT3ModelType.CodeDaVinci}>Code-Davinci</option>
-        <option value={GPT3ModelType.DaVinci}>Davinci</option>
+        <option value={ChatGPTModelType.Default}>Default</option>
       </select>
       <br />
       <label htmlFor="modelName">Max Tokens:</label>
@@ -105,6 +100,15 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         max="1"
       />
       <br />
+      <label htmlFor="systemMessage">System Message:</label>
+      <textarea
+        name="systemMessage"
+        id="systemMessage"
+        value={state.systemMessage}
+        onChange={handleInputChange}
+        rows={5}
+      />
+      <br />
       <StopSequenceInput
         stopSequences={state.stop}
         onChange={onStopSequenceChange}
@@ -113,4 +117,4 @@ const GPT3SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
   );
 };
 
-export default GPT3SettingsForm;
+export default ChatGPTSettingsForm;

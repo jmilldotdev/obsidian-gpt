@@ -11,7 +11,7 @@ class GPTSettingTab extends PluginSettingTab {
 
   display(): void {
     let { containerEl } = this;
-    let { gpt3, ai21, cohere } = this.plugin.settings.models;
+    let { gpt3, chatgpt, ai21, cohere } = this.plugin.settings.models;
 
     containerEl.empty();
 
@@ -28,6 +28,19 @@ class GPTSettingTab extends PluginSettingTab {
           .setValue(gpt3.apiKey)
           .onChange(async (value) => {
             gpt3.apiKey = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("ChatGPT API Key")
+      .setDesc("Enter your OpenAI API Key (to use with ChatGPT)")
+      .addText((text) =>
+        text
+          .setPlaceholder("API Key")
+          .setValue(chatgpt.apiKey)
+          .onChange(async (value) => {
+            chatgpt.apiKey = value;
             await this.plugin.saveSettings();
           })
       );

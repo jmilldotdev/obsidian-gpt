@@ -1,5 +1,6 @@
 import { Editor, Plugin, WorkspaceLeaf } from "obsidian";
 import { getAI21Completion } from "src/models/ai21";
+import { getChatGPTCompletion } from "src/models/chatGPT";
 import { getCohereCompletion } from "src/models/cohere";
 import { getGPT3Completion } from "src/models/gpt3";
 import {
@@ -48,7 +49,7 @@ export default class GPTPlugin extends Plugin {
   }
 
   async getCompletion(selection: string): Promise<string | null> {
-    const { ai21, gpt3, cohere } = this.settings.models;
+    const { ai21, chatgpt, gpt3, cohere } = this.settings.models;
     let completion: string;
     const notice = gettingCompletionNotice(this.settings.activeModel);
     if (this.settings.activeModel === SupportedModels.AI21) {
@@ -69,6 +70,13 @@ export default class GPTPlugin extends Plugin {
         selection,
         cohere.settings
       );
+    } else if (this.settings.activeModel === SupportedModels.CHATGPT) {
+      const message = await getChatGPTCompletion(
+        chatgpt.apiKey,
+        selection,
+        chatgpt.settings
+      );
+      completion = "\n\n" + message;
     }
     notice.hide();
     return completion;
@@ -161,8 +169,25 @@ export default class GPTPlugin extends Plugin {
     }
   }
 
+  async populateSettingDefaults() {
+    // ensure that each model's default settings are populated
+    const settings = this.settings;
+    console.log(settings);
+    Object.values(SupportedModels).forEach((model) => {
+      if (!settings.models[model]) {
+        console.log("populating default settings for", model);
+        settings.models[model] = {
+          settings: DEFAULT_SETTINGS.models[model].settings as never,
+          apiKey: "",
+        };
+      }
+    });
+    await this.saveData(settings);
+  }
+
   async onload() {
     await this.loadSettings();
+    await this.populateSettingDefaults();
 
     this.registerView(
       VIEW_TYPE_MODEL_SETTINGS,
