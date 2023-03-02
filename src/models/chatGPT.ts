@@ -1,17 +1,20 @@
 import { request, RequestParam } from "obsidian";
 import { pythonifyKeys } from "src/util";
 
-export enum GPT3ModelType {
-  Ada = "text-ada-001",
-  Babbage = "text-babbage-001",
-  Curie = "text-curie-001",
-  TextDaVinci = "text-davinci-003",
-  CodeDaVinci = "code-davinci-002",
-  DaVinci = "davinci",
+export enum ChatGPTModelType {
+  Default = "gpt-3.5-turbo",
 }
 
-export interface GPT3Settings {
-  modelType: GPT3ModelType;
+export type ChatRole = "user" | "system" | "assistant";
+
+export interface ChatMessage {
+  role: ChatRole;
+  content: string;
+}
+
+export interface ChatGPTSettings {
+  modelType: ChatGPTModelType;
+  systemMessage: string;
   maxTokens: number;
   temperature: number;
   topP: number;
@@ -20,9 +23,11 @@ export interface GPT3Settings {
   stop: string[];
 }
 
-export const defaultGPT3Settings: GPT3Settings = {
-  modelType: GPT3ModelType.TextDaVinci,
-  maxTokens: 16,
+export const defaultChatGPTSettings: ChatGPTSettings = {
+  modelType: ChatGPTModelType.Default,
+  systemMessage:
+    "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.",
+  maxTokens: 200,
   temperature: 1.0,
   topP: 1.0,
   presencePenalty: 0,
@@ -30,20 +35,20 @@ export const defaultGPT3Settings: GPT3Settings = {
   stop: [],
 };
 
-export const getGPT3Completion = async (
+export const getChatGPTCompletion = async (
   apiKey: string,
-  prompt: string,
-  settings: GPT3Settings,
+  messages: ChatMessage[],
+  settings: ChatGPTSettings,
   suffix?: string
 ): Promise<string> => {
-  const apiUrl = `https://api.openai.com/v1/completions`;
+  const apiUrl = `https://api.openai.com/v1/chat/completions`;
   const headers = {
     Authorization: `Bearer ${apiKey}`,
     "Content-Type": "application/json",
   };
-  const { modelType, ...params } = settings;
+  const { modelType, systemMessage, ...params } = settings;
   let body = {
-    prompt,
+    messages,
     model: modelType,
     ...pythonifyKeys(params),
     stop: settings.stop.length > 0 ? settings.stop : undefined,
@@ -63,5 +68,5 @@ export const getGPT3Completion = async (
     .catch((err) => {
       console.error(err);
     });
-  return res?.choices?.[0]?.text ?? null;
+  return res?.choices?.[0]?.message?.content ?? null;
 };

@@ -1,5 +1,10 @@
-import { Editor, Plugin, WorkspaceLeaf } from "obsidian";
+import { Editor, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
 import { getAI21Completion } from "src/models/ai21";
+import {
+  ChatMessage,
+  ChatRole,
+  getChatGPTCompletion,
+} from "src/models/chatGPT";
 import { getCohereCompletion } from "src/models/cohere";
 import { getGPT3Completion } from "src/models/gpt3";
 import {
@@ -38,6 +43,11 @@ export default class GPTPlugin extends Plugin {
     return currentLineContents;
   }
 
+  getNoteContents(editor: Editor) {
+    const noteContents = editor.getValue();
+    return noteContents;
+  }
+
   getSuffix(selection: string) {
     if (selection.includes(this.settings.insertToken)) {
       const prompt = selection.split(this.settings.insertToken)[0];
@@ -48,7 +58,7 @@ export default class GPTPlugin extends Plugin {
   }
 
   async getCompletion(selection: string): Promise<string | null> {
-    const { ai21, gpt3, cohere } = this.settings.models;
+    const { ai21, chatgpt, gpt3, cohere } = this.settings.models;
     let completion: string;
     const notice = gettingCompletionNotice(this.settings.activeModel);
     if (this.settings.activeModel === SupportedModels.AI21) {
@@ -69,8 +79,48 @@ export default class GPTPlugin extends Plugin {
         selection,
         cohere.settings
       );
+    } else if (this.settings.activeModel === SupportedModels.CHATGPT) {
+      const messages: ChatMessage[] = [
+        {
+          role: "system",
+          content: chatgpt.settings.systemMessage,
+        },
+        {
+          role: "user",
+          content: selection,
+        },
+      ];
+      const message = await getChatGPTCompletion(
+        chatgpt.apiKey,
+        messages,
+        chatgpt.settings
+      );
+      completion = "\n\n" + message;
     }
     notice.hide();
+    return completion;
+  }
+
+  async getChatCompletion(selection: string) {
+    const { chatgpt } = this.settings.models;
+    const messagesText = selection.split(this.settings.chatSeparator);
+    let messages: ChatMessage[] = [
+      {
+        role: "system",
+        content: chatgpt.settings.systemMessage,
+      },
+      ...messagesText.map((message, idx) => {
+        return {
+          role: idx % 2 === 0 ? "user" : ("assistant" as ChatRole),
+          content: message.trim(),
+        };
+      }),
+    ];
+    const completion = await getChatGPTCompletion(
+      chatgpt.apiKey,
+      messages,
+      chatgpt.settings
+    );
     return completion;
   }
 
@@ -78,7 +128,11 @@ export default class GPTPlugin extends Plugin {
     errorGettingCompletionNotice();
   }
 
-  formatCompletion(prompt: string, completion: string) {
+  formatCompletion(
+    prompt: string,
+    completion: string,
+    isChatCompletion = false
+  ) {
     const {
       tagCompletions,
       tagCompletionsHandlerTags,
@@ -92,6 +146,11 @@ export default class GPTPlugin extends Plugin {
 
     if (tagPrompts) {
       prompt = `${tagPromptsHandlerTags.openingTag}${prompt}${tagPromptsHandlerTags.closingTag}`;
+    }
+
+    if (isChatCompletion) {
+      prompt += "\n\n" + this.settings.chatSeparator + "\n\n";
+      completion += "\n\n" + this.settings.chatSeparator + "\n\n";
     }
 
     return prompt + completion;
@@ -123,6 +182,29 @@ export default class GPTPlugin extends Plugin {
       );
       editor.setLine(currentLineContents.lineNumber, formatted);
       return;
+    }
+  }
+
+  async chatCompletionHandler(editor: Editor) {
+    const selection: string = this.getSelectedText(editor);
+    if (selection) {
+      const completion = await this.getChatCompletion(selection);
+      if (!completion) {
+        this.handleGetCompletionError();
+        return;
+      }
+      editor.replaceSelection(
+        this.formatCompletion(selection, completion, true)
+      );
+      return;
+    } else {
+      const noteContents = this.getNoteContents(editor);
+      const completion = await this.getChatCompletion(noteContents);
+      if (!completion) {
+        this.handleGetCompletionError();
+        return;
+      }
+      editor.setValue(this.formatCompletion(noteContents, completion, true));
     }
   }
 
@@ -161,8 +243,28 @@ export default class GPTPlugin extends Plugin {
     }
   }
 
+  async populateSettingDefaults() {
+    // ensure that each model's default settings are populated
+    const settings = this.settings;
+    console.log(settings);
+    Object.values(SupportedModels).forEach((model) => {
+      if (!settings.models[model]) {
+        console.log("populating default settings for", model);
+        settings.models[model] = {
+          settings: DEFAULT_SETTINGS.models[model].settings as never,
+          apiKey: "",
+        };
+      }
+    });
+    if (!settings.chatSeparator) {
+      settings.chatSeparator = DEFAULT_SETTINGS.chatSeparator;
+    }
+    await this.saveData(settings);
+  }
+
   async onload() {
     await this.loadSettings();
+    await this.populateSettingDefaults();
 
     this.registerView(
       VIEW_TYPE_MODEL_SETTINGS,
@@ -173,6 +275,12 @@ export default class GPTPlugin extends Plugin {
       id: "get-completion",
       name: "Get Completion",
       editorCallback: (editor: Editor) => this.getCompletionHandler(editor),
+    });
+
+    this.addCommand({
+      id: "chat-completion",
+      name: "Chat Completion",
+      editorCallback: (editor: Editor) => this.chatCompletionHandler(editor),
     });
 
     this.addCommand({

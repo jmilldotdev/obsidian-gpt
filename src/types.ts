@@ -1,16 +1,22 @@
 import { AI21Settings, defaultAI21Settings } from "src/models/ai21";
+import { ChatGPTSettings, defaultChatGPTSettings } from "src/models/chatGPT";
 import { CohereSettings, defaultCohereSettings } from "src/models/cohere";
 import { GPT3Settings, defaultGPT3Settings } from "src/models/gpt3";
 
 export const VIEW_TYPE_MODEL_SETTINGS = "gptModelSettings";
 
 export enum SupportedModels {
-  GPT3 = "GPT-3",
-  AI21 = "AI21",
-  COHERE = "Cohere",
+  CHATGPT = "chatgpt",
+  GPT3 = "gpt3",
+  AI21 = "ai21",
+  COHERE = "cohere",
 }
 
 export interface Models {
+  chatgpt: {
+    apiKey: string;
+    settings: ChatGPTSettings;
+  };
   gpt3: {
     apiKey: string;
     settings: GPT3Settings;
@@ -38,11 +44,16 @@ export interface GPTPluginSettings {
   tagPrompts: boolean;
   tagPromptsHandlerTags: HandlerTags;
   insertToken: string;
+  chatSeparator: string;
 }
 
 export const DEFAULT_SETTINGS: GPTPluginSettings = {
   activeModel: SupportedModels.GPT3,
   models: {
+    chatgpt: {
+      apiKey: "",
+      settings: defaultChatGPTSettings,
+    },
     gpt3: {
       apiKey: "",
       settings: defaultGPT3Settings,
@@ -67,6 +78,7 @@ export const DEFAULT_SETTINGS: GPTPluginSettings = {
     closingTag: "</Prompt>",
   },
   insertToken: "[insert]",
+  chatSeparator: "|||",
 };
 
 // Utils
