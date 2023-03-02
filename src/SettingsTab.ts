@@ -138,6 +138,17 @@ class GPTSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         })
     );
+
+    new Setting(containerEl)
+      .setName("Chat Completion Separator")
+      .addText((text) =>
+        text
+          .setValue(this.plugin.settings.chatSeparator)
+          .onChange(async (value) => {
+            this.plugin.settings.chatSeparator = value;
+            await this.plugin.saveSettings();
+          })
+      );
   }
 }
 

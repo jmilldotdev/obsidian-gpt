@@ -44,6 +44,7 @@ export interface GPTPluginSettings {
   tagPrompts: boolean;
   tagPromptsHandlerTags: HandlerTags;
   insertToken: string;
+  chatSeparator: string;
 }
 
 export const DEFAULT_SETTINGS: GPTPluginSettings = {
@@ -77,6 +78,7 @@ export const DEFAULT_SETTINGS: GPTPluginSettings = {
     closingTag: "</Prompt>",
   },
   insertToken: "[insert]",
+  chatSeparator: "|||",
 };
 
 // Utils

@@ -5,6 +5,13 @@ export enum ChatGPTModelType {
   Default = "gpt-3.5-turbo",
 }
 
+export type ChatRole = "user" | "system" | "assistant";
+
+export interface ChatMessage {
+  role: ChatRole;
+  content: string;
+}
+
 export interface ChatGPTSettings {
   modelType: ChatGPTModelType;
   systemMessage: string;
@@ -30,7 +37,7 @@ export const defaultChatGPTSettings: ChatGPTSettings = {
 
 export const getChatGPTCompletion = async (
   apiKey: string,
-  prompt: string,
+  messages: ChatMessage[],
   settings: ChatGPTSettings,
   suffix?: string
 ): Promise<string> => {
@@ -40,16 +47,6 @@ export const getChatGPTCompletion = async (
     "Content-Type": "application/json",
   };
   const { modelType, systemMessage, ...params } = settings;
-  const messages = [
-    {
-      role: "system",
-      content: systemMessage,
-    },
-    {
-      role: "user",
-      content: prompt,
-    },
-  ];
   let body = {
     messages,
     model: modelType,
@@ -57,7 +54,6 @@ export const getChatGPTCompletion = async (
     stop: settings.stop.length > 0 ? settings.stop : undefined,
     suffix: suffix ? suffix : undefined,
   };
-  console.log(body);
   const requestParam: RequestParam = {
     url: apiUrl,
     method: "POST",
