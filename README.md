@@ -3,6 +3,7 @@
 Text completions via Large Language Models.
 
 Currently supported providers:
+- [ChatGPT](https://openai.com/api/)
 - [OpenAI](https://openai.com/api/)
 - [AI21](https://studio.ai21.com/overview)
 - [Cohere](https://cohere.ai/)
