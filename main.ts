@@ -90,19 +90,21 @@ export default class GPTPlugin extends Plugin {
           content: selection,
         },
       ];
-      const message = await getChatGPTCompletion(
-        chatgpt.apiKey,
+      completion = await getChatGPTCompletion(
+        gpt3.apiKey,
         messages,
         chatgpt.settings
       );
-      completion = "\n\n" + message;
+      if (completion) {
+        completion = "\n\n" + completion;
+      }
     }
     notice.hide();
     return completion;
   }
 
   async getChatCompletion(selection: string) {
-    const { chatgpt } = this.settings.models;
+    const { chatgpt, gpt3 } = this.settings.models;
     const messagesText = selection.split(this.settings.chatSeparator);
     let messages: ChatMessage[] = [
       {
@@ -116,11 +118,13 @@ export default class GPTPlugin extends Plugin {
         };
       }),
     ];
+    const notice = gettingCompletionNotice(this.settings.activeModel);
     const completion = await getChatGPTCompletion(
-      chatgpt.apiKey,
+      gpt3.apiKey,
       messages,
       chatgpt.settings
     );
+    notice.hide();
     return completion;
   }
 
@@ -138,19 +142,31 @@ export default class GPTPlugin extends Plugin {
       tagCompletionsHandlerTags,
       tagPrompts,
       tagPromptsHandlerTags,
+      tagChatCompletions,
+      tagChatCompletionsHandlerTags,
+      tagChatPrompts,
+      tagChatPromptsHandlerTags,
     } = this.settings;
-
-    if (tagCompletions) {
-      completion = `${tagCompletionsHandlerTags.openingTag}${completion}${tagCompletionsHandlerTags.closingTag}`;
-    }
-
-    if (tagPrompts) {
-      prompt = `${tagPromptsHandlerTags.openingTag}${prompt}${tagPromptsHandlerTags.closingTag}`;
-    }
-
+    
     if (isChatCompletion) {
+      if (tagChatCompletions) {
+        completion = `${tagChatCompletionsHandlerTags.openingTag}${completion}${tagChatCompletionsHandlerTags.closingTag}`;
+      }
+
+      if (tagChatPrompts) {
+        prompt = `${tagChatPromptsHandlerTags.openingTag}${prompt}${tagChatPromptsHandlerTags.closingTag}`;
+      }
+
       prompt += "\n\n" + this.settings.chatSeparator + "\n\n";
       completion += "\n\n" + this.settings.chatSeparator + "\n\n";
+    } else {
+      if (tagCompletions) {
+        completion = `${tagCompletionsHandlerTags.openingTag}${completion}${tagCompletionsHandlerTags.closingTag}`;
+      }
+
+      if (tagPrompts) {
+        prompt = `${tagPromptsHandlerTags.openingTag}${prompt}${tagPromptsHandlerTags.closingTag}`;
+      }
     }
 
     return prompt + completion;

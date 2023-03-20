@@ -1,6 +1,6 @@
 {
   "name": "obsidian-gpt",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Obsidian plugin for getting language model completions from GPT-3, ChatGPT, Cohere, and others",
   "main": "main.js",
   "scripts": {

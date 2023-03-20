@@ -43,6 +43,7 @@ const ChatGPTSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         onChange={handleInputChange}
       >
         <option value={ChatGPTModelType.Default}>Default</option>
+        <option value={ChatGPTModelType.GPT4}>GPT-4</option>
       </select>
       <br />
       <label htmlFor="modelName">Max Tokens:</label>

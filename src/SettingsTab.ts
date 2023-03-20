@@ -33,19 +33,6 @@ class GPTSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("ChatGPT API Key")
-      .setDesc("Enter your OpenAI API Key (to use with ChatGPT)")
-      .addText((text) =>
-        text
-          .setPlaceholder("API Key")
-          .setValue(chatgpt.apiKey)
-          .onChange(async (value) => {
-            chatgpt.apiKey = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
       .setName("AI21 API Key")
       .setDesc("Enter your AI21 API Key")
       .addText((text) =>
@@ -67,6 +54,17 @@ class GPTSettingTab extends PluginSettingTab {
           .setValue(cohere.apiKey)
           .onChange(async (value) => {
             cohere.apiKey = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Chat Completion Separator")
+      .addText((text) =>
+        text
+          .setValue(this.plugin.settings.chatSeparator)
+          .onChange(async (value) => {
+            this.plugin.settings.chatSeparator = value;
             await this.plugin.saveSettings();
           })
       );
@@ -140,12 +138,81 @@ class GPTSettingTab extends PluginSettingTab {
     );
 
     new Setting(containerEl)
-      .setName("Chat Completion Separator")
+      .setName("Tag Chat Completions?")
+      .setDesc(
+        "Optionally put a tag around text which was generated via chat completion"
+      )
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.tagChatCompletions)
+          .onChange(async (value) => {
+            this.plugin.settings.tagChatCompletions = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Opening Chat Completion Tag")
       .addText((text) =>
         text
-          .setValue(this.plugin.settings.chatSeparator)
+          .setPlaceholder("<ChatCompletion>")
+          .setValue(
+            this.plugin.settings.tagChatCompletionsHandlerTags.openingTag
+          )
           .onChange(async (value) => {
-            this.plugin.settings.chatSeparator = value;
+            this.plugin.settings.tagChatCompletionsHandlerTags.openingTag =
+              value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Closing Chat Completion Tag")
+      .addText((text) =>
+        text
+          .setPlaceholder("</ChatCompletion>")
+          .setValue(
+            this.plugin.settings.tagChatCompletionsHandlerTags.closingTag
+          )
+          .onChange(async (value) => {
+            this.plugin.settings.tagChatCompletionsHandlerTags.closingTag =
+              value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Tag Chat Prompts?")
+      .setDesc("Optionally put a tag around text which was used as chat prompt")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.tagChatPrompts)
+          .onChange(async (value) => {
+            this.plugin.settings.tagChatPrompts = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Opening Chat Prompt Tag")
+      .addText((text) =>
+        text
+          .setPlaceholder("<Prompt>")
+          .setValue(this.plugin.settings.tagChatPromptsHandlerTags.openingTag)
+          .onChange(async (value) => {
+            this.plugin.settings.tagChatPromptsHandlerTags.openingTag = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName("Closing Chat Prompt Tag")
+      .addText((text) =>
+        text
+          .setPlaceholder("</Prompt>")
+          .setValue(this.plugin.settings.tagChatPromptsHandlerTags.closingTag)
+          .onChange(async (value) => {
+            this.plugin.settings.tagChatPromptsHandlerTags.closingTag = value;
             await this.plugin.saveSettings();
           })
       );

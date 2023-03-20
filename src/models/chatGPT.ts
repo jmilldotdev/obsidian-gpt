@@ -3,6 +3,7 @@ import { pythonifyKeys } from "src/util";
 
 export enum ChatGPTModelType {
   Default = "gpt-3.5-turbo",
+  GPT4 = "gpt-4",
 }
 
 export type ChatRole = "user" | "system" | "assistant";
@@ -54,6 +55,7 @@ export const getChatGPTCompletion = async (
     stop: settings.stop.length > 0 ? settings.stop : undefined,
     suffix: suffix ? suffix : undefined,
   };
+  console.log(body);
   const requestParam: RequestParam = {
     url: apiUrl,
     method: "POST",
@@ -68,5 +70,5 @@ export const getChatGPTCompletion = async (
     .catch((err) => {
       console.error(err);
     });
-  return res?.choices?.[0]?.message?.content ?? null;
+  return res?.choices?.[0]?.message?.content;
 };

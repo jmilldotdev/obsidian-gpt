@@ -14,7 +14,6 @@ export enum SupportedModels {
 
 export interface Models {
   chatgpt: {
-    apiKey: string;
     settings: ChatGPTSettings;
   };
   gpt3: {
@@ -43,6 +42,10 @@ export interface GPTPluginSettings {
   tagCompletionsHandlerTags: HandlerTags;
   tagPrompts: boolean;
   tagPromptsHandlerTags: HandlerTags;
+  tagChatPrompts: boolean;
+  tagChatPromptsHandlerTags: HandlerTags;
+  tagChatCompletions: boolean;
+  tagChatCompletionsHandlerTags: HandlerTags;
   insertToken: string;
   chatSeparator: string;
 }
@@ -51,7 +54,6 @@ export const DEFAULT_SETTINGS: GPTPluginSettings = {
   activeModel: SupportedModels.GPT3,
   models: {
     chatgpt: {
-      apiKey: "",
       settings: defaultChatGPTSettings,
     },
     gpt3: {
@@ -77,8 +79,18 @@ export const DEFAULT_SETTINGS: GPTPluginSettings = {
     openingTag: "<Prompt>",
     closingTag: "</Prompt>",
   },
+  tagChatPrompts: false,
+  tagChatPromptsHandlerTags: {
+    openingTag: "<ChatPrompt>",
+    closingTag: "</ChatPrompt>",
+  },
+  tagChatCompletions: false,
+  tagChatCompletionsHandlerTags: {
+    openingTag: "<ChatCompletion>",
+    closingTag: "</ChatCompletion>",
+  },
   insertToken: "[insert]",
-  chatSeparator: "|||",
+  chatSeparator: "===",
 };
 
 // Utils
