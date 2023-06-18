@@ -8,6 +8,12 @@ export enum CohereModelType {
   XLarge = "xlarge",
 }
 
+// To support the latest cohere version, see https://docs.cohere.com/reference/versioning
+export enum CohereVersionEnum {
+  '2021-11-08' = '2021-11-08',
+  '2022-12-06' = '2022-12-06',
+}
+
 export interface CohereSettings {
   modelType: CohereModelType;
   maxTokens: number;
@@ -17,6 +23,7 @@ export interface CohereSettings {
   presencePenalty: number;
   frequencyPenalty: number;
   stopSequences: string[];
+  version: CohereVersionEnum;
 }
 
 export const defaultCohereSettings: CohereSettings = {
@@ -28,6 +35,7 @@ export const defaultCohereSettings: CohereSettings = {
   presencePenalty: 0,
   frequencyPenalty: 0,
   stopSequences: [],
+  version: CohereVersionEnum['2021-11-08'],
 };
 
 export const getCohereCompletion = async (
@@ -39,7 +47,7 @@ export const getCohereCompletion = async (
   const headers = {
     Authorization: `Bearer ${apiKey}`,
     "Content-Type": "application/json",
-    "Cohere-Version": "2021-11-08",
+    "Cohere-Version": settings.version,
   };
   const { modelType, ...params } = settings;
   let body = {
