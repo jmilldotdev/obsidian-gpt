@@ -1,7 +1,7 @@
 import * as React from "react";
 import StopSequenceInput from "src/ui/StopSequenceInput";
 
-import { CohereModelType } from "../models/cohere";
+import { CohereModelType, CohereVersionEnum } from "../models/cohere";
 import GPTPlugin from "../../main";
 
 const CohereSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
@@ -10,7 +10,9 @@ const CohereSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
 
   const handleInputChange = async (e: any) => {
     let { name, value } = e.target;
-    if (parseFloat(value) || value === "0") {
+    if (e.target.id !== 'version' // Do not parse version
+      && (parseFloat(value) || value === "0")
+    ) {
       value = parseFloat(value);
     }
     setState((prevState) => ({
@@ -118,6 +120,21 @@ const CohereSettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
         stopSequences={state.stopSequences}
         onChange={onStopSequenceChange}
       />
+      <label htmlFor="version">Version:</label>
+      <select
+        name="version"
+        id="version"
+        value={state.version}
+        onChange={handleInputChange}
+      >
+        {
+          Object.keys(CohereVersionEnum).map((key: CohereVersionEnum) => {
+            const value = CohereVersionEnum[key];
+            return <option key={key} value={value}>{value}</option>
+          })
+        }
+      </select>
+      <br />
     </form>
   );
 };
