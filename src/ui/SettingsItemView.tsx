@@ -3,53 +3,179 @@ import * as ReactDOM from "react-dom";
 
 import { AppContext, SettingsContext } from "src/context";
 import { ItemView, WorkspaceLeaf } from "obsidian";
-import {
-  VIEW_TYPE_MODEL_SETTINGS,
-  GPTPluginSettings,
-  SupportedModels,
-} from "../types";
+import { VIEW_TYPE_MODEL_SETTINGS, GPTPluginSettings } from "../types";
 import GPTPlugin from "main";
-import ChatGPTSettingsForm from "./ChatGPTSettingsForm";
-import GPT3SettingsForm from "./GPT3SettingsForm";
-import AI21SettingsForm from "./AI21SettingsForm";
-import CohereSettingsForm from "./CohereSettingsForm";
+
+import StopSequenceInput from "src/ui/StopSequenceInput";
+import { refetchModels } from "src/openrouter";
 
 const SettingsForm = ({ plugin }: { plugin: GPTPlugin }) => {
-  const [activeModel, setActiveModel] = React.useState(
-    plugin.settings.activeModel
+  const { settings } = plugin;
+  const [state, setState] = React.useState(settings.openRouter);
+  const [availableModels, setAvailableModels] = React.useState(
+    settings.availableModels
   );
+
+  const handleInputChange = async (e: any) => {
+    let { name, value } = e.target;
+    if (parseFloat(value) || value === "0") {
+      value = parseFloat(value);
+    }
+    setState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    settings.openRouter = {
+      ...settings.openRouter,
+      [name]: value,
+    };
+    await plugin.saveSettings();
+  };
+
+  const onStopSequenceChange = async (stopSequences: string[]) => {
+    setState((prevState) => ({
+      ...prevState,
+      stop: stopSequences,
+    }));
+    settings.openRouter.stop = stopSequences;
+    await plugin.saveSettings();
+  };
+
+  const refetchModelState = async () => {
+    const models = await refetchModels();
+    settings.availableModels = models;
+    await plugin.saveSettings();
+    setAvailableModels(models);
+  };
+
   return (
-    <div className="settingsForm">
-      <label htmlFor="">Select Model:</label>
-      <select
-        name="activeModel"
-        id="activeModel"
-        value={activeModel}
-        onChange={async (e) => {
-          const model = e.target.value as SupportedModels;
-          setActiveModel(model);
-          plugin.settings.activeModel = model;
-          await plugin.saveSettings();
-        }}
-      >
-        <option value={SupportedModels.CHATGPT}>ChatGPT</option>
-        <option value={SupportedModels.GPT3}>GPT-3</option>
-        <option value={SupportedModels.AI21}>AI21</option>
-        <option value={SupportedModels.COHERE}>Cohere</option>
-      </select>
-      {activeModel === SupportedModels.CHATGPT && (
-        <ChatGPTSettingsForm plugin={plugin} />
-      )}
-      {activeModel === SupportedModels.GPT3 && (
-        <GPT3SettingsForm plugin={plugin} />
-      )}
-      {activeModel === SupportedModels.AI21 && (
-        <AI21SettingsForm plugin={plugin} />
-      )}
-      {activeModel === SupportedModels.COHERE && (
-        <CohereSettingsForm plugin={plugin} />
-      )}
-    </div>
+    <form>
+      <div style={{ marginBottom: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "10px",
+          }}
+        >
+          <label style={{ marginBottom: "10px" }} htmlFor="model">
+            Selected Model:
+          </label>
+          <button onClick={refetchModelState} type="button">
+            Refetch Models
+          </button>
+        </div>
+        <select
+          name="model"
+          id="model"
+          value={state.model}
+          onChange={handleInputChange}
+          style={{ display: "block", width: "100%" }}
+        >
+          {availableModels.map((model) => (
+            <option key={model} value={model}>
+              {model}
+            </option>
+          ))}
+        </select>
+        <br />
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <label style={{ marginBottom: "10px" }} htmlFor="max_tokens">
+            Max Tokens:
+          </label>
+          <label style={{ textAlign: "right" }}>{state.max_tokens}</label>
+        </div>
+        <input
+          style={{ display: "block", width: "100%" }}
+          type="range"
+          name="max_tokens"
+          id="max_tokens"
+          value={state.max_tokens}
+          onChange={handleInputChange}
+          min="1"
+          max="2048"
+        />
+        <br />
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <label style={{ marginBottom: "10px" }} htmlFor="temperature">
+            Temperature:
+          </label>
+          <label style={{ textAlign: "right" }}>{state.temperature}</label>
+        </div>
+        <input
+          style={{ display: "block", width: "100%" }}
+          type="range"
+          name="temperature"
+          id="temperature"
+          value={state.temperature}
+          onChange={handleInputChange}
+          min="0"
+          max="2"
+          step="0.01"
+        />
+        <br />
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <label style={{ marginBottom: "10px" }} htmlFor="top_p">
+            Top P:
+          </label>
+          <label style={{ textAlign: "right" }}>{state.top_p}</label>
+        </div>
+        <input
+          style={{ display: "block", width: "100%" }}
+          type="range"
+          name="top_p"
+          id="top_p"
+          value={state.top_p}
+          onChange={handleInputChange}
+          min="0"
+          max="1"
+          step="0.01"
+        />
+        <br />
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <label style={{ marginBottom: "10px" }} htmlFor="frequency_penalty">
+            Frequency Penalty:
+          </label>
+          <label style={{ textAlign: "right" }}>
+            {state.frequency_penalty}
+          </label>
+        </div>
+        <input
+          style={{ display: "block", width: "100%" }}
+          type="range"
+          name="frequency_penalty"
+          id="frequency_penalty"
+          value={state.frequency_penalty}
+          onChange={handleInputChange}
+          min="-2"
+          max="2"
+          step="0.01"
+        />
+        <br />
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <label style={{ marginBottom: "10px" }} htmlFor="presence_penalty">
+            Presence Penalty:
+          </label>
+          <label style={{ textAlign: "right" }}>{state.presence_penalty}</label>
+        </div>
+        <input
+          style={{ display: "block", width: "100%" }}
+          type="range"
+          name="presence_penalty"
+          id="presence_penalty"
+          value={state.presence_penalty}
+          onChange={handleInputChange}
+          min="-2"
+          max="2"
+          step="0.01"
+        />
+        <br />
+        <StopSequenceInput
+          stopSequences={state.stop}
+          onChange={onStopSequenceChange}
+        />
+      </div>
+    </form>
   );
 };
 

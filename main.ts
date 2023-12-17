@@ -1,22 +1,15 @@
-import { Editor, MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
-import { getAI21Completion } from "src/models/ai21";
-import {
-  ChatMessage,
-  ChatRole,
-  getChatGPTCompletion,
-} from "src/models/chatGPT";
-import { getCohereCompletion } from "src/models/cohere";
-import { getGPT3Completion } from "src/models/gpt3";
+import { Editor, Plugin, WorkspaceLeaf } from "obsidian";
 import {
   gettingCompletionNotice,
   errorGettingCompletionNotice,
 } from "src/notices";
+import { getCompletion, refetchModels } from "src/openrouter";
 import GPTSettingTab from "src/SettingsTab";
 import {
   CurrentLineContents,
   DEFAULT_SETTINGS,
   GPTPluginSettings,
-  SupportedModels,
+  ORRequest,
   VIEW_TYPE_MODEL_SETTINGS,
 } from "src/types";
 import SettingsItemView from "src/ui/SettingsItemView";
@@ -58,72 +51,9 @@ export default class GPTPlugin extends Plugin {
   }
 
   async getCompletion(selection: string): Promise<string | null> {
-    const { ai21, chatgpt, gpt3, cohere } = this.settings.models;
     let completion: string;
-    const notice = gettingCompletionNotice(this.settings.activeModel);
-    if (this.settings.activeModel === SupportedModels.AI21) {
-      completion = await getAI21Completion(
-        ai21.apiKey,
-        selection,
-        ai21.settings
-      );
-    } else if (this.settings.activeModel === SupportedModels.GPT3) {
-      completion = await getGPT3Completion(
-        gpt3.apiKey,
-        selection,
-        gpt3.settings
-      );
-    } else if (this.settings.activeModel === SupportedModels.COHERE) {
-      completion = await getCohereCompletion(
-        cohere.apiKey,
-        selection,
-        cohere.settings
-      );
-    } else if (this.settings.activeModel === SupportedModels.CHATGPT) {
-      const messages: ChatMessage[] = [
-        {
-          role: "system",
-          content: chatgpt.settings.systemMessage,
-        },
-        {
-          role: "user",
-          content: selection,
-        },
-      ];
-      completion = await getChatGPTCompletion(
-        gpt3.apiKey,
-        messages,
-        chatgpt.settings
-      );
-      if (completion) {
-        completion = "\n\n" + completion;
-      }
-    }
-    notice.hide();
-    return completion;
-  }
-
-  async getChatCompletion(selection: string) {
-    const { chatgpt, gpt3 } = this.settings.models;
-    const messagesText = selection.split(this.settings.chatSeparator);
-    let messages: ChatMessage[] = [
-      {
-        role: "system",
-        content: chatgpt.settings.systemMessage,
-      },
-      ...messagesText.map((message, idx) => {
-        return {
-          role: idx % 2 === 0 ? "user" : ("assistant" as ChatRole),
-          content: message.trim(),
-        };
-      }),
-    ];
-    const notice = gettingCompletionNotice(this.settings.activeModel);
-    const completion = await getChatGPTCompletion(
-      gpt3.apiKey,
-      messages,
-      chatgpt.settings
-    );
+    const notice = gettingCompletionNotice("test");
+    completion = await getCompletion(selection, this.settings);
     notice.hide();
     return completion;
   }
@@ -132,41 +62,20 @@ export default class GPTPlugin extends Plugin {
     errorGettingCompletionNotice();
   }
 
-  formatCompletion(
-    prompt: string,
-    completion: string,
-    isChatCompletion = false
-  ) {
+  formatCompletion(prompt: string, completion: string) {
     const {
       tagCompletions,
       tagCompletionsHandlerTags,
       tagPrompts,
       tagPromptsHandlerTags,
-      tagChatCompletions,
-      tagChatCompletionsHandlerTags,
-      tagChatPrompts,
-      tagChatPromptsHandlerTags,
     } = this.settings;
-    
-    if (isChatCompletion) {
-      if (tagChatCompletions) {
-        completion = `${tagChatCompletionsHandlerTags.openingTag}${completion}${tagChatCompletionsHandlerTags.closingTag}`;
-      }
 
-      if (tagChatPrompts) {
-        prompt = `${tagChatPromptsHandlerTags.openingTag}${prompt}${tagChatPromptsHandlerTags.closingTag}`;
-      }
+    if (tagCompletions) {
+      completion = `${tagCompletionsHandlerTags.openingTag}${completion}${tagCompletionsHandlerTags.closingTag}`;
+    }
 
-      prompt += "\n\n" + this.settings.chatSeparator + "\n\n";
-      completion += "\n\n" + this.settings.chatSeparator + "\n\n";
-    } else {
-      if (tagCompletions) {
-        completion = `${tagCompletionsHandlerTags.openingTag}${completion}${tagCompletionsHandlerTags.closingTag}`;
-      }
-
-      if (tagPrompts) {
-        prompt = `${tagPromptsHandlerTags.openingTag}${prompt}${tagPromptsHandlerTags.closingTag}`;
-      }
+    if (tagPrompts) {
+      prompt = `${tagPromptsHandlerTags.openingTag}${prompt}${tagPromptsHandlerTags.closingTag}`;
     }
 
     return prompt + completion;
@@ -198,29 +107,6 @@ export default class GPTPlugin extends Plugin {
       );
       editor.setLine(currentLineContents.lineNumber, formatted);
       return;
-    }
-  }
-
-  async chatCompletionHandler(editor: Editor) {
-    const selection: string = this.getSelectedText(editor);
-    if (selection) {
-      const completion = await this.getChatCompletion(selection);
-      if (!completion) {
-        this.handleGetCompletionError();
-        return;
-      }
-      editor.replaceSelection(
-        this.formatCompletion(selection, completion, true)
-      );
-      return;
-    } else {
-      const noteContents = this.getNoteContents(editor);
-      const completion = await this.getChatCompletion(noteContents);
-      if (!completion) {
-        this.handleGetCompletionError();
-        return;
-      }
-      editor.setValue(this.formatCompletion(noteContents, completion, true));
     }
   }
 
@@ -262,18 +148,14 @@ export default class GPTPlugin extends Plugin {
   async populateSettingDefaults() {
     // ensure that each model's default settings are populated
     const settings = this.settings;
-    console.log(settings);
-    Object.values(SupportedModels).forEach((model) => {
-      if (!settings.models[model]) {
-        console.log("populating default settings for", model);
-        settings.models[model] = {
-          settings: DEFAULT_SETTINGS.models[model].settings as never,
-          apiKey: "",
-        };
-      }
-    });
-    if (!settings.chatSeparator) {
-      settings.chatSeparator = DEFAULT_SETTINGS.chatSeparator;
+    if (!settings.openRouter) {
+      console.log("populating default settings for openrouter");
+      settings.openRouter = DEFAULT_SETTINGS.openRouter;
+    }
+    if (!settings.availableModels || !settings.availableModels.length) {
+      console.log("populating available models");
+      const models = await refetchModels();
+      this.settings.availableModels = models;
     }
     await this.saveData(settings);
   }
@@ -291,12 +173,6 @@ export default class GPTPlugin extends Plugin {
       id: "get-completion",
       name: "Get Completion",
       editorCallback: (editor: Editor) => this.getCompletionHandler(editor),
-    });
-
-    this.addCommand({
-      id: "chat-completion",
-      name: "Chat Completion",
-      editorCallback: (editor: Editor) => this.chatCompletionHandler(editor),
     });
 
     this.addCommand({

@@ -11,7 +11,6 @@ class GPTSettingTab extends PluginSettingTab {
 
   display(): void {
     let { containerEl } = this;
-    let { gpt3, chatgpt, ai21, cohere } = this.plugin.settings.models;
 
     containerEl.empty();
 
@@ -20,51 +19,14 @@ class GPTSettingTab extends PluginSettingTab {
     containerEl.createEl("h3", { text: "API Keys" });
 
     new Setting(containerEl)
-      .setName("OpenAI API Key")
-      .setDesc("Enter your OpenAI API Key")
+      .setName("Openrouter API Key")
+      .setDesc("Enter your Openrouter API Key")
       .addText((text) =>
         text
-          .setPlaceholder("API Key")
-          .setValue(gpt3.apiKey)
+          .setPlaceholder("Openrouter API Key")
+          .setValue(this.plugin.settings.openRouter.apiKey)
           .onChange(async (value) => {
-            gpt3.apiKey = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("AI21 API Key")
-      .setDesc("Enter your AI21 API Key")
-      .addText((text) =>
-        text
-          .setPlaceholder("API Key")
-          .setValue(ai21.apiKey)
-          .onChange(async (value) => {
-            ai21.apiKey = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Cohere API Key")
-      .setDesc("Enter your Cohere API Key")
-      .addText((text) =>
-        text
-          .setPlaceholder("API Key")
-          .setValue(cohere.apiKey)
-          .onChange(async (value) => {
-            cohere.apiKey = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Chat Completion Separator")
-      .addText((text) =>
-        text
-          .setValue(this.plugin.settings.chatSeparator)
-          .onChange(async (value) => {
-            this.plugin.settings.chatSeparator = value;
+            this.plugin.settings.openRouter.apiKey = value;
             await this.plugin.saveSettings();
           })
       );
@@ -136,86 +98,6 @@ class GPTSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         })
     );
-
-    new Setting(containerEl)
-      .setName("Tag Chat Completions?")
-      .setDesc(
-        "Optionally put a tag around text which was generated via chat completion"
-      )
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.tagChatCompletions)
-          .onChange(async (value) => {
-            this.plugin.settings.tagChatCompletions = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Opening Chat Completion Tag")
-      .addText((text) =>
-        text
-          .setPlaceholder("<ChatCompletion>")
-          .setValue(
-            this.plugin.settings.tagChatCompletionsHandlerTags.openingTag
-          )
-          .onChange(async (value) => {
-            this.plugin.settings.tagChatCompletionsHandlerTags.openingTag =
-              value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Closing Chat Completion Tag")
-      .addText((text) =>
-        text
-          .setPlaceholder("</ChatCompletion>")
-          .setValue(
-            this.plugin.settings.tagChatCompletionsHandlerTags.closingTag
-          )
-          .onChange(async (value) => {
-            this.plugin.settings.tagChatCompletionsHandlerTags.closingTag =
-              value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Tag Chat Prompts?")
-      .setDesc("Optionally put a tag around text which was used as chat prompt")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.tagChatPrompts)
-          .onChange(async (value) => {
-            this.plugin.settings.tagChatPrompts = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Opening Chat Prompt Tag")
-      .addText((text) =>
-        text
-          .setPlaceholder("<Prompt>")
-          .setValue(this.plugin.settings.tagChatPromptsHandlerTags.openingTag)
-          .onChange(async (value) => {
-            this.plugin.settings.tagChatPromptsHandlerTags.openingTag = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Closing Chat Prompt Tag")
-      .addText((text) =>
-        text
-          .setPlaceholder("</Prompt>")
-          .setValue(this.plugin.settings.tagChatPromptsHandlerTags.closingTag)
-          .onChange(async (value) => {
-            this.plugin.settings.tagChatPromptsHandlerTags.closingTag = value;
-            await this.plugin.saveSettings();
-          })
-      );
   }
 }
 
