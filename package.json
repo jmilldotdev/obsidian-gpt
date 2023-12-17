@@ -1,6 +1,6 @@
 {
   "name": "obsidian-gpt",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Obsidian plugin for getting language model completions from Openrouter. Use any supported model, including ChatGPT, Claude, LLaMa, and more.",
   "main": "main.js",
   "scripts": {

@@ -42,7 +42,7 @@ export const getCompletion = async (
       console.error(err);
     });
   const text = parseResponseText(res);
-  return " " + text;
+  return text;
 };
 
 interface ORModel {
