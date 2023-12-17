@@ -1,16 +1,10 @@
-# Obsidian GPT (& Friends)
+# Obsidian GPT
 
-Text completions via Large Language Models.
-
-Currently supported providers:
-- [ChatGPT](https://openai.com/api/)
-- [OpenAI](https://openai.com/api/)
-- [AI21](https://studio.ai21.com/overview)
-- [Cohere](https://cohere.ai/)
+"Obsidian plugin for getting language model completions from [Openrouter](https://openrouter.ai). Use any supported model, including ChatGPT, Claude, LLaMa, and more.
 
 ## Setup
 
-Acquire an API key from one or more of the supported providers. Open the plugin settings and paste the API key you wish to use in the field for the respective provider.
+Acquire an API key from [Openrouter](https://openrouter.ai). Open the plugin settings and paste in your API key.
 
 
 ## Usage

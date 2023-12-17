@@ -1,9 +1,9 @@
 {
   "id": "obsidian-gpt",
   "name": "GPT",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "minAppVersion": "0.9.12",
-  "description": "Obsidian plugin for getting language model completions from GPT-3, ChatGPT, Cohere, and others",
+  "description": "Obsidian plugin for getting language model completions from Openrouter. Use any supported model, including ChatGPT, Claude, LLaMa, and more.",
   "author": "Jonathan Miller",
   "authorUrl": "https://jmill.dev",
   "isDesktopOnly": false
